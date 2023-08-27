@@ -59,11 +59,6 @@ class h:
 
 h1 = h()
 
-class Data:
-    _text_ = None
-    _int_ = None
-    _settings_ = None
-
 def save(prop, props):
     if not Data._settings_:
         return
