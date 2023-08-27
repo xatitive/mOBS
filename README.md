@@ -9,3 +9,15 @@ This script is currently able to
 - Play a sound on OBS start
 - Play a sound when clipping with specified hotkey
 - Notifications
+
+## Requirements 
+```
+obspython
+simpleaudio
+psutil
+pathlib
+notifypy
+```
+
+To install:
+`pip install -r requirements.txt`
