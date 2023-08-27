@@ -1,0 +1,4 @@
+simpleaudio
+psutil
+pathlib
+notifypy

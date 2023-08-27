@@ -1,15 +1,14 @@
 import obspython as S
-import playsound
-import os as os
+import simpleaudio as sa
 import psutil
 from pathlib import Path
-from utils.running_apps import get_running_processes
 from notifypy import Notify
 
 enabled = True
+debug_mode = False
 play_start_sound = True
 play_clip_sound = True
-auto_add_game = True
+auto_start_buffer = True
 clip_sound_path = ""
 start_sound_path = ""
 
@@ -92,31 +91,52 @@ def script_description():
     return "Adds some custom QoL clipping features currently not currently avaliable"
 
 def script_load(settings):
+    global debug_mode
     global h1
+    if debug_mode: 
+        print("[mOBS] Loaded")
+
     notification.message = "mOBS started"
     notification.send()
-    h1.htk_copy = Hotkey(clip_sound, settings, "mOBS Hotkey")
+    h1.htk_copy = Hotkey((clip_sound), settings, "mOBS Hotkey")
     script_update(settings)
     script_save_json_settings()
+    if play_start_sound != False:
+        start_sound()
+    if auto_start_buffer != False:
+        S.obs_frontend_replay_buffer_start()
+
 
 def script_unload():
+    if debug_mode: 
+        print("[mOBS] Unloaded")
     notification.message = "mOBS stopped"
     notification.send()
 
 def script_defaults(settings):
+    
     global global_settings
+    global debug_mode
+    if debug_mode: 
+        print("[mOBS] >Loading defaults")
+
     S.obs_data_set_default_bool(settings, "enabled", enabled)
+    S.obs_data_set_default_bool(settings, "debug_mode", debug_mode)
+    S.obs_data_set_default_bool(settings, "auto_start_buffer", enabled)
     S.obs_data_set_default_bool(settings, "play_start_sound", enabled)
     S.obs_data_set_default_bool(settings, "play_clip_sound", enabled)
-    S.obs_data_set_default_bool(settings, "auto_add_game", enabled)
 
 def script_properties():
+    if debug_mode: 
+        print("[mOBS] Setting properties")
+
     props = S.obs_properties_create()
 
     S.obs_properties_add_bool(props, "enabled", "Enabled")
+    S.obs_properties_add_bool(props, "debug_mode", "Debug mode")
+    S.obs_properties_add_bool(props, "auto_start_buffer", "Replay buffer start on load")
     S.obs_properties_add_bool(props, "play_start_sound", "Play sound on start")
     S.obs_properties_add_bool(props, "play_clip_sound", "Play sound on clip")
-    S.obs_properties_add_bool(props, "auto_add_game", "Auto add game to scene")
     S.obs_properties_add_path(props, "clip_sound_path", "Path to clip sound", S.OBS_PATH_FILE, "", None)
     S.obs_properties_add_path(props, "start_sound_path", "Path to start sound", S.OBS_PATH_FILE, "", None)
     S.obs_properties_add_button(props, "save", "Save", save)
@@ -124,82 +144,35 @@ def script_properties():
     return props
 
 def script_save(settings):
+    if debug_mode: 
+        print("[mOBS] Saving settings")
     h1.htk_copy.save_hotkey()
     script_update(settings)
 
 def clip_sound(pressed):
-    if pressed:
-        playsound.playsound(clip_sound_path)
+        sa.WaveObject.from_wave_file(clip_sound_path).play()
 
+def start_sound():
+    sa.WaveObject.from_wave_file(start_sound_path).play()
 
 def script_update(settings):
     global enabled
+    global debug_mode
+    global auto_start_buffer
     global play_start_sound
     global play_clip_sound
-    global auto_add_game
     global clip_sound_path
     global start_sound_path
+    if debug_mode: 
+        print("[mOBS] Updating settings")
 
     enabled = S.obs_data_get_bool(settings, "enabled")
+    debug_mode = S.obs_data_get_bool(settings, "debug_mode")
+    auto_start_buffer = S.obs_data_get_bool(settings, "auto_start_buffer")
     play_start_sound = S.obs_data_get_bool(settings, "play_start_sound")
     play_clip_sound = S.obs_data_get_bool(settings, "play_clip_sound")
-    auto_add_game = S.obs_data_get_bool(settings, "auto_add_game")
     clip_sound_path = S.obs_data_get_string(settings, "clip_sound_path")
     start_sound_path = S.obs_data_get_string(settings, "start_sound_path")
     Data._settings_ = settings
     notification.message = "mOBS settings updated"
     notification.send()
-
-
-
-
-
-
-
-
-
-
-
-
-
-def game_source_append():
-    print("todo")
-
-def game_identification():
-    print("todo")
-
-def json_game_logic():
-    print("todo")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
