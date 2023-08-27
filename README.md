@@ -1,6 +1,6 @@
 # mOBS
 OBS Plugin to add some custom QoL clipping features currently not currently avaliable
-> heavily templated from [this repo]([https://github.com/Bootscreen/OBS-Skripte)
+> heavily templated from [this repo](https://github.com/Bootscreen/OBS-Skripte)
 
 ## Features
 
